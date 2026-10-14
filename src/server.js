@@ -91,17 +91,19 @@ app.use((error, _request, response, _next) => {
   response.status(status).json({ error: error.message || 'Internal server error' });
 });
 
-const server = app.listen(config.port, () => {
-  console.log(`Prixubot listening on port ${config.port}`);
-});
+if (!process.env.VERCEL) {
+  const server = app.listen(config.port, () => {
+    console.log(`Prixubot listening on port ${config.port}`);
+  });
 
-const shutdown = (signal) => {
-  console.log(`${signal} received; shutting down`);
-  server.close(() => process.exit(0));
-  setTimeout(() => process.exit(1), 10_000).unref();
-};
+  const shutdown = (signal) => {
+    console.log(`${signal} received; shutting down`);
+    server.close(() => process.exit(0));
+    setTimeout(() => process.exit(1), 10_000).unref();
+  };
 
-process.once('SIGTERM', () => shutdown('SIGTERM'));
-process.once('SIGINT', () => shutdown('SIGINT'));
+  process.once('SIGTERM', () => shutdown('SIGTERM'));
+  process.once('SIGINT', () => shutdown('SIGINT'));
+}
 
 export { app };
